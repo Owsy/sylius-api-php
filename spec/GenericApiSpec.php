@@ -64,7 +64,7 @@ class GenericApiSpec extends ObjectBehavior
     {
         $response->getHeader('Content-Type')->willReturn('application/json');
         $response->json()->willReturn(['id' => 1, 'name' => 'Resource name']);
-        $client->get('uri/1')->willReturn($response)->shouldBeCalled();
+        $client->get('uri/1', [])->willReturn($response)->shouldBeCalled();
 
         $this->get(1)->shouldReturn(['id' => 1, 'name' => 'Resource name']);
     }
@@ -74,7 +74,7 @@ class GenericApiSpec extends ObjectBehavior
         $this->beConstructedWith($client, 'parentUri/{parentId}/uri', $adapterFactory, $paginatorFactory);
         $response->getHeader('Content-Type')->willReturn('application/json');
         $response->json()->willReturn(['id' => 1, 'name' => 'Resource name']);
-        $client->get('parentUri/2/uri/1')->willReturn($response)->shouldBeCalled();
+        $client->get('parentUri/2/uri/1', [])->willReturn($response)->shouldBeCalled();
 
         $this->get(1, ['parentId' => 2] )->shouldReturn(['id' => 1, 'name' => 'Resource name']);
     }
@@ -84,9 +84,18 @@ class GenericApiSpec extends ObjectBehavior
         $this->beConstructedWith($client, 'parentUri/{parentId}/secondParentUri/{secondParentId}/uri', $adapterFactory, $paginatorFactory);
         $response->getHeader('Content-Type')->willReturn('application/json');
         $response->json()->willReturn(['id' => 1, 'name' => 'Resource name']);
-        $client->get('parentUri/2/secondParentUri/1/uri/1')->willReturn($response)->shouldBeCalled();
+        $client->get('parentUri/2/secondParentUri/1/uri/1', [])->willReturn($response)->shouldBeCalled();
 
         $this->get(1, ['parentId' => 2, 'secondParentId' => 1] )->shouldReturn(['id' => 1, 'name' => 'Resource name']);
+    }
+
+    function it_gets_resource_by_id_with_query_parameters($client, ResponseInterface $response)
+    {
+        $response->getHeader('Content-Type')->willReturn('application/json');
+        $response->json()->willReturn(['id' => 1, 'name' => 'Resource name']);
+        $client->get('uri/1', ['foo' => 'bar'])->willReturn($response)->shouldBeCalled();
+
+        $this->get(1, [], ['foo' => 'bar'])->shouldReturn(['id' => 1, 'name' => 'Resource name']);
     }
 
     function it_gets_paginated_resources($client, ResponseInterface $response)
@@ -267,7 +276,7 @@ class GenericApiSpec extends ObjectBehavior
         $response->getHeader('Content-Type')->willReturn('application/xhtml+xml');
         $response->getBody()->willReturn('body');
         $response->getStatusCode()->willReturn(400);
-        $client->get('uri/1')->willReturn($response)->shouldBeCalled();
+        $client->get('uri/1', [])->willReturn($response)->shouldBeCalled();
 
         $this->shouldThrow(new InvalidResponseFormatException('body', 400))->during('get', [1]);
     }
